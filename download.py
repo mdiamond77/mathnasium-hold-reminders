@@ -11,9 +11,13 @@ CENTER_IDS = [c["radius_id"] for c in CENTERS.values()]
 
 def _login(page) -> None:
     """Log into Radius."""
+    username = os.environ.get("RADIUS_USERNAME")
+    password = os.environ.get("RADIUS_PASSWORD")
+    if not username or not password:
+        raise EnvironmentError("RADIUS_USERNAME and RADIUS_PASSWORD environment variables must be set.")
     page.goto(RADIUS_LOGIN_URL)
-    page.fill("#UserName", os.environ.get("RADIUS_USERNAME"))
-    page.fill("#Password", os.environ.get("RADIUS_PASSWORD"))
+    page.fill("#UserName", value=username)
+    page.fill("#Password", value=password)
     page.click("#login")
     page.wait_for_load_state("networkidle")
 
