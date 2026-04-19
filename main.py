@@ -53,7 +53,7 @@ def main():
 
     try:
         print("Downloading holds report...")
-        paths = download_reports(month_label)
+        paths = download_reports(month_label, month=month_num, year=year)
 
         print("Processing data...")
         center_data = process(paths["holds"], month=month_num, year=year)
