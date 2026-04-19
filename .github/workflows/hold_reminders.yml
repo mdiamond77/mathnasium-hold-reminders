@@ -29,7 +29,12 @@ jobs:
           RADIUS_PASSWORD: ${{ secrets.RADIUS_PASSWORD }}
           SMTP_USER: ${{ secrets.SMTP_USER }}
           SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
-        run: python main.py --trigger auto
+        run: |
+          if [ "${{ github.event_name }}" = "workflow_dispatch" ]; then
+            python main.py --trigger manual
+          else
+            python main.py --trigger auto
+          fi
 
       - name: Commit run log
         run: |
