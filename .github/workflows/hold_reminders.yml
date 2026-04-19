@@ -1,0 +1,40 @@
+name: Hold Reminder Emails
+
+on:
+  schedule:
+    - cron: "0 15 * * 1,2,4"   # Mon/Tue/Thu at 11am ET (3pm UTC)
+  workflow_dispatch:             # manual trigger for testing
+
+jobs:
+  run:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install dependencies
+        run: |
+          pip install -r requirements.txt
+          playwright install chromium
+
+      - name: Run automation
+        env:
+          RADIUS_USERNAME: ${{ secrets.RADIUS_USERNAME }}
+          RADIUS_PASSWORD: ${{ secrets.RADIUS_PASSWORD }}
+          SMTP_USER: ${{ secrets.SMTP_USER }}
+          SMTP_PASSWORD: ${{ secrets.SMTP_PASSWORD }}
+        run: python main.py --trigger auto
+
+      - name: Commit run log
+        run: |
+          git config user.name "github-actions[bot]"
+          git config user.email "github-actions[bot]@users.noreply.github.com"
+          git add run_log.json
+          git diff --cached --quiet || git commit -m "chore: update run log [skip ci]"
+          git push
