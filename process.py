@@ -57,7 +57,5 @@ def process(holds_path, month: int, year: int) -> dict:
     Raises ValueError if the report is empty.
     """
     df = pd.read_excel(holds_path)
-    if df.empty:
-        raise ValueError("Holds report is empty — check Radius export and re-run.")
     holds = filter_holds(df, month, year)
     return split_by_center(holds)

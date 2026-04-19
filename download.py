@@ -36,17 +36,28 @@ def download_holds_report(page, month_label: str, month: int, year: int) -> Path
     page.goto(HOLDS_REPORT_URL)
     page.wait_for_load_state("networkidle")
 
-    # Set date range to cover the full target month
+    # Set date range using the Kendo DatePicker API (plain .val() doesn't update widget state)
     page.evaluate(
         """([from_, to_]) => {
-            $('#ReportStart').val(from_);
-            $('#ReportEnd').val(to_);
+            var dpStart = $('#ReportStart').data('kendoDatePicker');
+            var dpEnd   = $('#ReportEnd').data('kendoDatePicker');
+            dpStart.value(from_);
+            dpStart.trigger('change');
+            dpEnd.value(to_);
+            dpEnd.trigger('change');
         }""",
         [date_from, date_to],
     )
 
     page.click("#btnsearch")
     page.wait_for_load_state("networkidle")
+
+    # Wait for the Kendo grid to finish binding data after the XHR completes
+    page.wait_for_function(
+        "() => { var g = $('#gridHoldsReport').data('kendoGrid'); "
+        "return g && g.dataSource && !g.dataSource._requestInProgress; }",
+        timeout=30000,
+    )
 
     # Read data directly from the Kendo grid datasource
     records = page.evaluate("""
