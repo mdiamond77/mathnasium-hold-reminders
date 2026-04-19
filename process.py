@@ -19,10 +19,13 @@ def filter_holds(df: pd.DataFrame, month: int, year: int) -> list[dict]:
     """
     results = []
     for _, row in df.iterrows():
-        end_date = pd.to_datetime(row[COL_HOLD_END_DATE])
+        end_date = pd.to_datetime(row[COL_HOLD_END_DATE], errors='coerce')
+        if pd.isna(end_date):
+            continue
         if end_date.month == month and end_date.year == year:
             results.append({
                 "name": row[COL_STUDENT_NAME],
+                # Format as M/D/YYYY without zero-padding to match Radius export display
                 "hold_end_date": "{}/{}/{}".format(
                     end_date.month, end_date.day, end_date.year
                 ),
