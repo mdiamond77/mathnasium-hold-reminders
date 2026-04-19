@@ -8,8 +8,11 @@ LOG_PATH = Path(__file__).parent / "run_log.json"
 def read_log() -> list:
     if not LOG_PATH.exists():
         return []
-    with open(LOG_PATH) as f:
-        return json.load(f)
+    try:
+        with open(LOG_PATH) as f:
+            return json.load(f)
+    except (json.JSONDecodeError, OSError):
+        return []
 
 
 def write_log(month: str, success: bool, trigger: str = "auto", error: str = "") -> None:

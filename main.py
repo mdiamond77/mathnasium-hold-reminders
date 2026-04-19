@@ -44,7 +44,8 @@ def main():
     year = int(month_str.split("-")[0])
     month_num = int(month_str.split("-")[1])
 
-    if args.trigger == "auto" and not is_last_week_of_month():
+    current_month_str = date.today().strftime("%Y-%m")
+    if args.trigger == "auto" and month_str == current_month_str and not is_last_week_of_month():
         print("Not in last 7 days of month — skipping.")
         return
 
