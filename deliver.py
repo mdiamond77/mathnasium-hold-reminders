@@ -55,9 +55,9 @@ def build_html(center_name: str, month_label: str, holds: list[dict]) -> str:
         "<html><body style='font-family:Arial,sans-serif;font-size:14px;"
         "max-width:700px;margin:0 auto;padding:20px;'>"
         "<p>Hi {center} Team,</p>"
-        "<p>The following students are scheduled to come off hold this month and return "
-        "to billing for the next cycle. Please confirm each one is still correct before "
-        "the end of the month.</p>"
+        "<p>The following students are scheduled to come off hold in <strong>{month}</strong> "
+        "and return to billing for the next cycle. Please confirm each one is still correct "
+        "before the end of the month.</p>"
         "{divider}"
         "{table}"
         "{divider}"
@@ -67,13 +67,15 @@ def build_html(center_name: str, month_label: str, holds: list[dict]) -> str:
         "last Monday, Tuesday, and Thursday of each month. "
         "Questions? Contact matt.diamond@mathnasium.com.</em></p>"
         "</body></html>"
-    ).format(center=center_name, divider=divider, table=table_html)
+    ).format(center=center_name, month=month_label, divider=divider, table=table_html)
 
 
 def send_email(center_name: str, month_label: str, html: str) -> None:
     """Send the HTML email for one center via Gmail SMTP."""
     smtp_user = os.environ.get("SMTP_USER")
     smtp_password = os.environ.get("SMTP_PASSWORD")
+    if not smtp_user or not smtp_password:
+        raise EnvironmentError("SMTP_USER and SMTP_PASSWORD environment variables must be set.")
     recipient = CENTERS[center_name]["recipient"]
 
     msg = MIMEMultipart("alternative")

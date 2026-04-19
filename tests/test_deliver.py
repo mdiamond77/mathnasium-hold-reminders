@@ -43,3 +43,8 @@ def test_build_html_is_valid_html():
     html = build_html("Teaneck", "April 2026", SAMPLE_HOLDS)
     assert html.strip().startswith("<html")
     assert "</html>" in html
+
+
+def test_build_html_contains_month_label():
+    html = build_html("Teaneck", "April 2026", SAMPLE_HOLDS)
+    assert "April 2026" in html
